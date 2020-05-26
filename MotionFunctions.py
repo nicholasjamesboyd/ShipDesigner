@@ -1,28 +1,31 @@
 import numpy as np
 
-class MotionFunctions():
-    
-    @staticmethod
-    def axeMotion():
-        sailing_conditions = np.ones((1,2),float)
-        exceedance = 0.05
-        return sailing_conditions, exceedance
+def CalculateMotions(hull_type, Length, Beam, Draft, Seas, MaxVelocity):
+    if (hull_type == "Axe"):
+        Motions = []
+        DownTime = 0.0
+        SailingConditions = []
+        return DownTime, SailingConditions
 
-    @staticmethod
-    def xMotion():
-        sailing_conditions = np.ones((1,2),float)
-        exceedance = 0.05
-        return sailing_conditions, exceedance
+    elif (hull_type == "X"):
+        Motions = []
+        DownTime = 0.0
+        SailingConditions = []
+        return DownTime, SailingConditions
 
-    @staticmethod
-    def vertMotion():
-        sailing_conditions = np.ones((1,2),float)
-        exceedance = 0.05
-        return sailing_conditions, exceedance
+    elif (hull_type == "Vertical"):
+        Motions = []
+        DownTime = 0.0
+        SailingConditions = []
+        return DownTime, SailingConditions
 
-    @staticmethod
-    def bulbMotion():
-        sailing_conditions = np.ones((1,2),float)
-        exceedance = 0.05
-        return sailing_conditions, exceedance
+    elif (hull_type == "Bulbous"):
+        Motions = []
+        DownTime = 0.0
+        SailingConditions = []
+        return DownTime, SailingConditions
 
+    else:
+        DownTime = 1.0
+        SailingConditions = []
+    return DownTime, SailingConditions
