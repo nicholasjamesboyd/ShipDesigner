@@ -19,7 +19,7 @@ field_distance = 200.0 #Distance in nautical miles
 area_cargo = 1500.0 #Total deck area of cargo delivered per cycle m^2
 volume_cargo = 8000.0 #Total bulk volument of cargo per cycle m^3
 deadweight_cargo = 16000.0 #Total weight of cargo per cycle tonnes
-max_vert_velocity = 4.0 #Maximum tolerable vertical velocity for which the cargo operations can occur m/s
+max_vert_velocity = 0.4 #Maximum tolerable vertical velocity for which the cargo operations can occur m/s
 cycle_length = 72 #Length of a cargo cycle in hours
 StandbyShipRequired = True #Is a ship required for standby
 
@@ -86,8 +86,8 @@ for hulltype in hull_types: #Check Every Type of Hull
 
 print("Calculation Complete - View xxx.csv for table of results")
 
-#sort the np.array by lowest cost
+#TODO sort the np.array by lowest cost
 
 table = np.vstack((["Hull Type","Number of Ships","Length","Beam","Draft","Design Speed","Power","Annual Cost"],results)) #Adds a header to the table
 
-#Write the sorted results to a csv file with headers
+#TODO Write the sorted results to a csv file with headers
