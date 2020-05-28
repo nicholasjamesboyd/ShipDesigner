@@ -22,6 +22,7 @@ deadweight_cargo = 16000.0 #Total weight of cargo per cycle tonnes
 max_vert_velocity = 0.4 #Maximum tolerable vertical velocity for which the cargo operations can occur m/s
 cycle_length = 72 #Length of a cargo cycle in hours
 StandbyShipRequired = True #Is a ship required for standby
+fuel_cost = 289.0 #Fuel cost is dollars/mt
 
 #Enter Design Limits
 l_min = 60 #minimum length considered in m
@@ -72,11 +73,11 @@ for hulltype in hull_types: #Check Every Type of Hull
                 if(not stable): #if we find an unstable hull, don't proceed, skip to the next hull design
                     continue
                 
-                Downtime, SailingConditions = MF.CalculateMotions(hulltype,length,beam,draft,Waves,max_vert_velocity) #Find the percentage of time the vessel is down and the conditions under which it would be allowed to sail
+                Downtime, SailingConditions = MF.CalculateMotions(hulltype,length,draft,Waves,max_vert_velocity) #Find the percentage of time the vessel is down and the conditions under which it would be allowed to sail
                 
                 for n in range(n_min,n_max+1,1): #for all possible fleet sizes
                     #Find the cost, average speed, and installed power required for this vessel arrangement
-                    cost, designspeed, power = CC.CalculateCost(hulltype,length,beam,draft,displacement,n,Downtime,SailingConditions,StandbyShipRequired,field_distance,area_cargo,volume_cargo,deadweight_cargo,cycle_length)
+                    cost, designspeed, power = CC.CalculateCost(hulltype,length,beam,draft,displacement,n,Downtime,SailingConditions,StandbyShipRequired,field_distance,area_cargo,volume_cargo,deadweight_cargo,cycle_length,fuel_cost)
                     
                     print(cycle) #Feedback on result progress
                     
