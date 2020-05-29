@@ -77,18 +77,20 @@ for hulltype in hull_types: #Check Every Type of Hull
                 
                 for n in range(n_min,n_max+1,1): #for all possible fleet sizes
                     #Find the cost, average speed, and installed power required for this vessel arrangement
-                    cost, designspeed, power = CC.CalculateCost(hulltype,length,beam,draft,displacement,n,Downtime,SailingConditions,StandbyShipRequired,field_distance,area_cargo,volume_cargo,deadweight_cargo,cycle_length,fuel_cost)
-                    
+                    cost, designspeed, power, possible = CC.CalculateCost(hulltype,length,beam,draft,displacement,n,Downtime,SailingConditions,StandbyShipRequired,field_distance,area_cargo,volume_cargo,deadweight_cargo,cycle_length,fuel_cost)
+                    if (not possible): #If this is an impossible design, break the current iteration
+                        continue
                     print(cycle) #Feedback on result progress
                     
                     results[cycle] = [hulltype,n,length,beam,draft,designspeed,power,cost] #Reassign the results storage array to current result
                     
                     cycle += 1
 
-print("Calculation Complete - View xxx.csv for table of results")
+results = np.delete(results,range(cycle,runs),axis=0) #Remove empty rows
 
-#TODO sort the np.array by lowest cost
+results = results[np.argsort(results[:,7])] #Sort by the total annual cost
 
 table = np.vstack((["Hull Type","Number of Ships","Length","Beam","Draft","Design Speed","Power","Annual Cost"],results)) #Adds a header to the table
 
 #TODO Write the sorted results to a csv file with headers
+print("Calculation Complete - View xxx.csv for table of results")
