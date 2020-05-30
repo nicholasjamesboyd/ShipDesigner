@@ -7,7 +7,10 @@ def CalculateCost(hull_type, length, beam, draft, displacement, n, downtime, sai
     if(not possible):
         return 0.0, designspeed, 0.0, possible
     power, fuel_annual_cost = CalculateFuelCost(hull_type,length,beam,draft,designspeed,sailingconditions,runs,distance,cycle_length,fuel_cost,efficiency)
-    cost = 0.0
+    crew_cost = 0.0
+    amortization = 0.0
+    station_keeping_cost = 0.0
+    cost = fuel_annual_cost + crew_cost + amortization + station_keeping_cost
     return cost, designspeed, power, possible
 
 def CalculateCrewCost(length, beam, draft): #Function To Find the Crewing Cost of each vessel
@@ -64,7 +67,7 @@ def CalculateRequiredSpeed(cycle_length,number_deliveries,downtime,distance,n,st
         possible = True
         if speed < 10.0: #If lots of time is available, the speed doesnt need to be fast, but we still would not design a vessel for less than 10 knots, ships would simply spend more time in port
             speed = 10.0
-        if speed > 40.0: #Reject vessels that require impossibly fast designs
+        if speed > 30.0: #Reject vessels that require impossibly fast designs
             possible = False
         speed = math.ceil(speed)
     return speed, possible
@@ -77,29 +80,36 @@ def CalculateFuelCost(hull_type,length,beam,draft,speed,sailing_conditions,runs,
         fuel_cost_per_run = power * distance/speed * efficiency * fuel_cost / 1000000
         cost_per_cycle = runs * fuel_cost_per_run
         fuel_annual_cost = round(8760 / cycle_length * cost_per_cycle,0)
-        print(power, fuel_annual_cost)
         return power, fuel_annual_cost
 
     elif (hull_type == "X"):
-        power = 0.0
-        fuel_annual_cost = 0.0
-        print(power, fuel_annual_cost)
+        all_resistance = 10 ** (-2.68 - 0.0033*length + 0.025*beam + 0.71*draft + 0.034*sailing_conditions[:,0] + 0.68*sailing_conditions[:,1] + 0.067*speed - 0.00013 * length * speed - 0.11*draft*sailing_conditions[:,1] - 0.029 * sailing_conditions[:,1]**2 + 0.0047*draft*sailing_conditions[:,1])
+        average_resistance = np.mean(all_resistance)
+        power = round(average_resistance * speed * 0.5144,0)
+        fuel_cost_per_run = power * distance/speed * efficiency * fuel_cost / 1000000
+        cost_per_cycle = runs * fuel_cost_per_run
+        fuel_annual_cost = round(8760 / cycle_length * cost_per_cycle,0)
         return power, fuel_annual_cost
 
     elif (hull_type == "Vertical"):
-        power = 0.0
-        fuel_annual_cost = 0.0
-        print(power, fuel_annual_cost)
+        all_resistance = 10 ** (-4.62 - 0.011*length - 0.056*beam + 1.22*draft + 0.10*sailing_conditions[:,0] + 1.22*sailing_conditions[:,1] + 0.054 * speed + 0.00022*length*beam - 0.20*draft*sailing_conditions[:,1] - 0.0049*sailing_conditions[:,0]*sailing_conditions[:,1] + 0.0015*beam**2 - 0.05*sailing_conditions[:,1]**2 + 0.0082*draft*sailing_conditions[:,1]**2)
+        average_resistance = np.mean(all_resistance)
+        power = round(average_resistance * speed * 0.5144,0)
+        fuel_cost_per_run = power * distance/speed * efficiency * fuel_cost / 1000000
+        cost_per_cycle = runs * fuel_cost_per_run
+        fuel_annual_cost = round(8760 / cycle_length * cost_per_cycle,0)
         return power, fuel_annual_cost
 
     elif (hull_type == "Bulbous"):
-        power = 0.0
-        fuel_annual_cost = 0.0
-        print(power, fuel_annual_cost)
+        all_resistance = 10 ** (-0.91 + 0.01*length + 0.023*beam + 0.2*draft + 0.032*sailing_conditions[:,0] + 0.14*speed - 0.0013 * length * draft - 0.00034 * length * speed - 0.00063 * speed ** 2)
+        average_resistance = np.mean(all_resistance)
+        power = round(average_resistance * speed * 0.5144,0)
+        fuel_cost_per_run = power * distance/speed * efficiency * fuel_cost / 1000000
+        cost_per_cycle = runs * fuel_cost_per_run
+        fuel_annual_cost = round(8760 / cycle_length * cost_per_cycle,0)
         return power, fuel_annual_cost
 
     else:
         power = 0.0
         fuel_annual_cost = 0.0
-        print(power, fuel_annual_cost)
         return power, fuel_annual_cost

@@ -45,7 +45,7 @@ t_min = 4 #minimum draft considered in m
 t_max = 8 #maximum draft considered in m
 t_step = 1 #draft stepping for design cases in m
 n_max = 6 #Maximum fleet size considered
-stabcriteria = 0.15 #Minimum GM value to be considered stable
+stabcriteria = 1.0 #Minimum GM value to be considered stable
 
 if (StandbyShipRequired): #If a ship is required to be on standby we cannot have less than 2 ships
     n_min = 2
@@ -56,9 +56,7 @@ hull_types = ["Axe", "X", "Vertical", "Bulbous"]
 
 runs = CalculateRuns(hull_types,l_min,l_max,l_step,b_min,b_max,b_step,t_min,t_max,t_step,n_min,n_max)
 
-results0 = np.zeros([runs,7]) #Initialize Array
-results1 = np.empty([runs,1],dtype = "<U8") #Initialize a string array for the hull type labels (necessary since numpy won't allow string to override the float if created as 1 array)
-results = np.hstack((results1,results0)) #Build the storage array for results
+results_table = np.zeros([runs,8]) #Initialize Array
 
 cycle = 0 #For iterating steps
 
@@ -70,7 +68,7 @@ for hulltype in hull_types: #Check Every Type of Hull
 
             for draft in range(t_min,t_max+1,t_step): #check all possible drafts
 
-                stable, displacement = STB.CheckStability(hulltype,length,beam,draft,stabcriteria) #Performs a check of the stability for this specific hull design and calculates its displacement
+                stable, displacement = STB.CheckStability(hulltype,length,beam,draft,stabcriteria) #Performs a check of the stability and freeboard for this specific hull design and calculates its displacement
                 
                 if(not stable): #if we find an unstable hull, don't proceed, skip to the next hull design
                     continue
@@ -84,15 +82,13 @@ for hulltype in hull_types: #Check Every Type of Hull
                         continue
                     print(cycle) #Feedback on result progress
                     
-                    results[cycle] = [hulltype,n,length,beam,draft,designspeed,power,cost] #Reassign the results storage array to current result
+                    results_table[cycle,:] = [hull_types.index(hulltype),n,length,beam,draft,designspeed,power,cost] #Reassign the results storage array to current result
                     
                     cycle += 1
 
-results = np.delete(results,range(cycle,runs),axis=0) #Remove empty rows
+results_table = np.delete(results_table,range(cycle,runs),axis=0) #Remove empty rows
 
-results = results[np.argsort(results[:,7])] #Sort by the total annual cost
+results_table = results_table[np.argsort(results_table[:,7])] #Sort by the total annual cost
 
-table = np.vstack((["Hull Type","Number of Ships","Length","Beam","Draft","Design Speed","Power","Annual Cost"],results)) #Adds a header to the table
-
-#TODO Write the sorted results to a csv file with headers
-print("Calculation Complete - View xxx.csv for table of results")
+np.savetxt('FleetDesigns.csv',results_table,fmt = '%f', delimiter = ',', header = 'HullType,Number,Length,Beam,Draft,Speed,Power,AnnualCost') #Write the datatable to a csv file
+print("Calculation Complete - View FleetDesigns.csv for table of results")
