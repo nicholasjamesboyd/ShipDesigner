@@ -5,11 +5,20 @@ import MotionFunctions as MF
 import CostCalculator as CC
 import StabilityCheck as STB
 
+def CalculateRuns(hulltypes,lmin,lmax,lstep,bmin,bmax,bstep,tmin,tmax,tstep,nmin,nmax): #calculate all the runs we need so we can initialize an appropriate numpy array, add 1 to account for the first value
+    lruns = math.floor((lmax-lmin)/lstep)+1
+    bruns = math.floor((bmax-bmin)/bstep)+1
+    truns = math.floor((tmax-tmin)/tstep)+1
+    hullruns = len(hulltypes)
+    nruns = nmax - nmin + 1
+    return lruns*bruns*truns*hullruns*nruns
+
 #Enter Sea Parameters
 hmean = 4.0 #mean wave height
-hmode = np.sqrt(2/np.pi) * hmean
 tmean = 6.5 #mean wave period
 tdeviation = 1.0 #wave period standard deviation
+
+hmode = np.sqrt(2/np.pi) * hmean #Finds the mode wave height fromn the mean wave height as needed as input to rayleigh function
 h = np.reshape(np.random.rayleigh(hmode,(73000)),(-1,1)) #Generates a random significant wave height for 25 years of 3 hour seas
 t = np.reshape(np.random.normal(tmean,tdeviation,(73000)),(-1,1)) #Generates random period for 25 years of 3 hour seas
 Waves = np.hstack((h,t)) #Builds an array for each sea, each row is a significant wave height and peak period
@@ -23,6 +32,7 @@ max_vert_velocity = 0.4 #Maximum tolerable vertical velocity for which the cargo
 cycle_length = 72 #Length of a cargo cycle in hours
 StandbyShipRequired = True #Is a ship required for standby
 fuel_cost = 289.0 #Fuel cost is dollars/mt
+engine_efficiency = 151.0 #Engine fuel efficiency in g/kwh
 
 #Enter Design Limits
 l_min = 60 #minimum length considered in m
@@ -34,22 +44,15 @@ b_step = 1 #beam stepping for design cases in m
 t_min = 4 #minimum draft considered in m
 t_max = 8 #maximum draft considered in m
 t_step = 1 #draft stepping for design cases in m
+n_max = 6 #Maximum fleet size considered
+stabcriteria = 0.15 #Minimum GM value to be considered stable
+
 if (StandbyShipRequired): #If a ship is required to be on standby we cannot have less than 2 ships
     n_min = 2
 else:
     n_min = 1
-n_max = 6 #Maximum fleet size considered
-stabcriteria = 0.15 #Minimum GM value to be considered stable
 
 hull_types = ["Axe", "X", "Vertical", "Bulbous"]
-
-def CalculateRuns(hulltypes,lmin,lmax,lstep,bmin,bmax,bstep,tmin,tmax,tstep,nmin,nmax): #calculate all the runs we need so we can initialize an appropriate numpy array, add 1 to account for the first value
-    lruns = math.floor((lmax-lmin)/lstep)+1
-    bruns = math.floor((bmax-bmin)/bstep)+1
-    truns = math.floor((tmax-tmin)/tstep)+1
-    hullruns = len(hulltypes)
-    nruns = nmax - nmin + 1
-    return lruns*bruns*truns*hullruns*nruns
 
 runs = CalculateRuns(hull_types,l_min,l_max,l_step,b_min,b_max,b_step,t_min,t_max,t_step,n_min,n_max)
 
@@ -59,7 +62,6 @@ results = np.hstack((results1,results0)) #Build the storage array for results
 
 cycle = 0 #For iterating steps
 
-# Main Program Algorithm
 for hulltype in hull_types: #Check Every Type of Hull
 
     for length in range(l_min,l_max+1,l_step): #Check all possible design lengths
@@ -77,7 +79,7 @@ for hulltype in hull_types: #Check Every Type of Hull
                 
                 for n in range(n_min,n_max+1,1): #for all possible fleet sizes
                     #Find the cost, average speed, and installed power required for this vessel arrangement
-                    cost, designspeed, power, possible = CC.CalculateCost(hulltype,length,beam,draft,displacement,n,Downtime,SailingConditions,StandbyShipRequired,field_distance,area_cargo,volume_cargo,deadweight_cargo,cycle_length,fuel_cost)
+                    cost, designspeed, power, possible = CC.CalculateCost(hulltype,length,beam,draft,displacement,n,Downtime,SailingConditions,StandbyShipRequired,field_distance,area_cargo,volume_cargo,deadweight_cargo,cycle_length,fuel_cost,engine_efficiency)
                     if (not possible): #If this is an impossible design, break the current iteration
                         continue
                     print(cycle) #Feedback on result progress

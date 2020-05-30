@@ -1,10 +1,13 @@
 import math
+import numpy as np
 
-def CalculateCost(hull_type, length, beam, draft, displacement, n, downtime, sailingconditions, standby, distance, area, volume, deadweight, cycle_length, fuel_cost):
+def CalculateCost(hull_type, length, beam, draft, displacement, n, downtime, sailingconditions, standby, distance, area, volume, deadweight, cycle_length, fuel_cost,efficiency):
     runs = CalculateNumberDeliveries(length,beam,displacement,area,volume,deadweight)
     designspeed, possible = CalculateRequiredSpeed(cycle_length,runs,downtime,distance,n,standby)
+    if(not possible):
+        return 0.0, designspeed, 0.0, possible
+    power, fuel_annual_cost = CalculateFuelCost(hull_type,length,beam,draft,designspeed,sailingconditions,runs,distance,cycle_length,fuel_cost,efficiency)
     cost = 0.0
-    power = 0.0
     return cost, designspeed, power, possible
 
 def CalculateCrewCost(length, beam, draft): #Function To Find the Crewing Cost of each vessel
@@ -66,18 +69,37 @@ def CalculateRequiredSpeed(cycle_length,number_deliveries,downtime,distance,n,st
         speed = math.ceil(speed)
     return speed, possible
 
-def CalculateFuelCost(hull_type,length,beam,draft,speed,sailing_conditions,runs,distance,cycle_length,fuel_cost): #Calculates the fuel cost for the vessel
+def CalculateFuelCost(hull_type,length,beam,draft,speed,sailing_conditions,runs,distance,cycle_length,fuel_cost,efficiency): #Calculates the fuel cost for the vessel
     if (hull_type == "Axe"):
-        pass
+        all_resistance = 10 ** (-0.15 - 0.0077*length + 0.021*beam + 0.25*draft + 0.15 * sailing_conditions[:,0] + 0.095 * speed - 0.0018*length*draft + 0.000086 * length ** 2 - 0.019 * sailing_conditions[:,0] ** 2 - 0.00091 * speed ** 2)
+        average_resistance = np.mean(all_resistance)
+        power = round(average_resistance * speed * 0.5144,0)
+        fuel_cost_per_run = power * distance/speed * efficiency * fuel_cost / 1000000
+        cost_per_cycle = runs * fuel_cost_per_run
+        fuel_annual_cost = round(8760 / cycle_length * cost_per_cycle,0)
+        print(power, fuel_annual_cost)
+        return power, fuel_annual_cost
 
     elif (hull_type == "X"):
-        pass
+        power = 0.0
+        fuel_annual_cost = 0.0
+        print(power, fuel_annual_cost)
+        return power, fuel_annual_cost
 
     elif (hull_type == "Vertical"):
-        pass
+        power = 0.0
+        fuel_annual_cost = 0.0
+        print(power, fuel_annual_cost)
+        return power, fuel_annual_cost
 
     elif (hull_type == "Bulbous"):
-        pass
+        power = 0.0
+        fuel_annual_cost = 0.0
+        print(power, fuel_annual_cost)
+        return power, fuel_annual_cost
 
     else:
-        pass
+        power = 0.0
+        fuel_annual_cost = 0.0
+        print(power, fuel_annual_cost)
+        return power, fuel_annual_cost
