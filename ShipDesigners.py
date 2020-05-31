@@ -70,7 +70,7 @@ for hulltype in hull_types: #Check Every Type of Hull
 
                 stable, displacement = STB.CheckStability(hulltype,length,beam,draft,stabcriteria) #Performs a check of the stability and freeboard for this specific hull design and calculates its displacement
                 
-                if(not stable): #if we find an unstable hull, don't proceed, skip to the next hull design
+                if(not stable): #if we find an unstable or not loadline compliant hull, don't proceed, skip to the next hull design
                     continue
                 
                 Downtime, SailingConditions = MF.CalculateMotions(hulltype,length,draft,Waves,max_vert_velocity) #Find the percentage of time the vessel is down and the conditions under which it would be allowed to sail
