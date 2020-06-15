@@ -4,6 +4,7 @@ import math
 import MotionFunctions as MF
 import CostCalculator as CC
 import StabilityCheck as STB
+import matplotlib.pyplot as MPL #Kept for now for debugging to remove in release
 
 def CalculateRuns(hulltypes,lmin,lmax,lstep,bmin,bmax,bstep,tmin,tmax,tstep,nmin,nmax): #calculate all the runs we need so we can initialize an appropriate numpy array, add 1 to account for the first value
     lruns = math.floor((lmax-lmin)/lstep)+1
@@ -14,13 +15,27 @@ def CalculateRuns(hulltypes,lmin,lmax,lstep,bmin,bmax,bstep,tmin,tmax,tstep,nmin
     return lruns*bruns*truns*hullruns*nruns
 
 #Enter Sea Parameters
-hmean = 4.0 #mean wave height
+mu = 2.458 #Gumbel Mu Parameter for Wave Height
+beta = 1.101 #Gumbel Beta Parameter for Wave Height
 tmean = 6.5 #mean wave period
 tdeviation = 1.0 #wave period standard deviation
 
-hmode = np.sqrt(2/np.pi) * hmean #Finds the mode wave height fromn the mean wave height as needed as input to rayleigh function
-h = np.reshape(np.random.rayleigh(hmode,(73000)),(-1,1)) #Generates a random significant wave height for 25 years of 3 hour seas
-t = np.reshape(np.random.normal(tmean,tdeviation,(73000)),(-1,1)) #Generates random period for 25 years of 3 hour seas
+h = np.random.gumbel(mu, beta, 73000) #Generates a random significant wave height for 25 years of 3 hour seas
+
+for i in range(len(h)): #Removes any negative wave heights generated
+    if h[i] < 0:
+        h[i] = 0
+
+h = np.reshape(h,(-1,1))#organizes wave heights
+
+t = np.random.normal(tmean,tdeviation,(73000))
+
+for i in range(len(t)):
+    if t[i] < 0:
+        t[i] = 0
+
+t = np.reshape(t,(-1,1)) #Generates random period for 25 years of 3 hour seas
+
 Waves = np.hstack((h,t)) #Builds an array for each sea, each row is a significant wave height and peak period
 
 #Enter Operational Parameters
