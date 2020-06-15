@@ -83,7 +83,7 @@ def CalculateFuelCost(hull_type,length,beam,draft,speed,sailing_conditions,runs,
         return power, fuel_annual_cost
 
     elif (hull_type == "X"):
-        all_resistance = 10 ** (-2.68 - 0.0033*length + 0.025*beam + 0.71*draft + 0.034*sailing_conditions[:,0] + 0.68*sailing_conditions[:,1] + 0.067*speed - 0.00013 * length * speed - 0.11*draft*sailing_conditions[:,1] - 0.029 * sailing_conditions[:,1]**2 + 0.0047*draft*sailing_conditions[:,1])
+        all_resistance = 10 ** (-2.68 - 0.0033*length + 0.025*beam + 0.71*draft + 0.034*sailing_conditions[:,0] + 0.68*sailing_conditions[:,1] + 0.067*speed - 0.00013 * length * speed - 0.11*draft*sailing_conditions[:,1] - 0.029 * sailing_conditions[:,1]**2 + 0.0047*draft*sailing_conditions[:,1]**2)
         average_resistance = np.mean(all_resistance)
         power = round(average_resistance * speed * 0.5144,0)
         fuel_cost_per_run = power * distance/speed * efficiency * fuel_cost / 1000000

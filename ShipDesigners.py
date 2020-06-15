@@ -17,8 +17,8 @@ def CalculateRuns(hulltypes,lmin,lmax,lstep,bmin,bmax,bstep,tmin,tmax,tstep,nmin
 #Enter Sea Parameters
 mu = 2.458 #Gumbel Mu Parameter for Wave Height
 beta = 1.101 #Gumbel Beta Parameter for Wave Height
-tmean = 6.5 #mean wave period
-tdeviation = 1.0 #wave period standard deviation
+tmean = 10.05 #mean wave period
+tdeviation = 2.008 #wave period standard deviation
 
 h = np.random.gumbel(mu, beta, 73000) #Generates a random significant wave height for 25 years of 3 hour seas
 
@@ -28,7 +28,7 @@ for i in range(len(h)): #Removes any negative wave heights generated
 
 h = np.reshape(h,(-1,1))#organizes wave heights
 
-t = np.random.normal(tmean,tdeviation,(73000))
+t = np.random.normal(tmean,tdeviation,73000)
 
 for i in range(len(t)):
     if t[i] < 0:
@@ -39,7 +39,7 @@ t = np.reshape(t,(-1,1)) #Generates random period for 25 years of 3 hour seas
 Waves = np.hstack((h,t)) #Builds an array for each sea, each row is a significant wave height and peak period
 
 #Enter Operational Parameters
-field_distance = 200.0 #Distance in nautical miles
+field_distance = 250.0 #Distance in nautical miles
 area_cargo = 1500.0 #Total deck area of cargo delivered per cycle m^2
 volume_cargo = 8000.0 #Total bulk volument of cargo per cycle m^3
 deadweight_cargo = 16000.0 #Total weight of cargo per cycle tonnes
