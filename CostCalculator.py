@@ -33,9 +33,9 @@ def CalculateBuildCost(hull_type, length, beam, draft): #function to find the bu
         pass
 
 def CalculateNumberDeliveries(length, beam, displacement, area, volume, deadweight): #function to find the number of deliveries that need to be completed in a given cycle
-    Area_Ratio = 0.5 #Ratio between vessel block area and usable cargo area
-    Volume_Ratio = 0.5 #Ratio between the displacement and the bulk volume capacity
-    Weight_Ratio = 0.75 #Ratio between the deadweight capacity and total displacement
+    Area_Ratio = 0.41 #Ratio between vessel block area and usable cargo area
+    Volume_Ratio = 0.376 #Ratio between the displacement and the bulk volume capacity
+    Weight_Ratio = 0.471 #Ratio between the deadweight capacity and total displacement
     Area_Capacity = length * beam * Area_Ratio
     Volume_Capacity = displacement * Volume_Ratio
     Weight_Capacity = displacement * Weight_Ratio
