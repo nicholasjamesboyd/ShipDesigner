@@ -61,6 +61,7 @@ t_max = 8 #maximum draft considered in m
 t_step = 1 #draft stepping for design cases in m
 n_max = 6 #Maximum fleet size considered
 stabcriteria = 1.0 #Minimum GM value to be considered stable
+designlife = 20 #Design Lift of Ship in Years
 
 if (StandbyShipRequired): #If a ship is required to be on standby we cannot have less than 2 ships
     n_min = 2
@@ -92,7 +93,7 @@ for hulltype in hull_types: #Check Every Type of Hull
                 
                 for n in range(n_min,n_max+1,1): #for all possible fleet sizes
                     #Find the cost, average speed, and installed power required for this vessel arrangement
-                    cost, designspeed, power, possible = CC.CalculateCost(hulltype,length,beam,draft,displacement,n,Downtime,SailingConditions,StandbyShipRequired,field_distance,area_cargo,volume_cargo,deadweight_cargo,cycle_length,fuel_cost,engine_efficiency)
+                    cost, designspeed, power, possible = CC.CalculateCost(hulltype,length,beam,draft,displacement,n,Downtime,SailingConditions,StandbyShipRequired,field_distance,area_cargo,volume_cargo,deadweight_cargo,cycle_length,fuel_cost,engine_efficiency,designlife)
                     if (not possible): #If this is an impossible design, break the current iteration
                         continue
                     print(cycle) #Feedback on result progress

@@ -1,33 +1,106 @@
 import math
 import numpy as np
 
-def CalculateCost(hull_type, length, beam, draft, displacement, n, downtime, sailingconditions, standby, distance, area, volume, deadweight, cycle_length, fuel_cost,efficiency):
-    runs = CalculateNumberDeliveries(length,beam,displacement,area,volume,deadweight)
-    designspeed, possible = CalculateRequiredSpeed(cycle_length,runs,downtime,distance,n,standby)
+def CalculateCost(hull_type, length, beam, draft, displacement, n, downtime, sailingconditions, standby, distance, area, volume, deadweight, cycle_length, fuel_cost,efficiency,designlife):
+    runs = CalculateNumberDeliveries(length,beam,displacement,area,volume,deadweight) #Find the number of required delivery runs
+
+    designspeed, possible = CalculateRequiredSpeed(cycle_length,runs,downtime,distance,n,standby) #Determine the speed and if this vessel isn't impossibly fast
     if(not possible):
         return 0.0, designspeed, 0.0, possible
-    power, fuel_annual_cost = CalculateFuelCost(hull_type,length,beam,draft,designspeed,sailingconditions,runs,distance,cycle_length,fuel_cost,efficiency)
-    crew_cost = 0.0
-    amortization = 0.0
-    station_keeping_cost = 0.0
+
+    power, fuel_annual_cost = CalculateFuelCost(hull_type,length,beam,draft,designspeed,sailingconditions,runs,distance,cycle_length,fuel_cost,efficiency) #Determine the total required engine power and fleet fuel costs
+    
+    crew_cost = 0.0 #Determine the cost of crewing required for this vessel
+    
+    buildcost, possible = CalculateBuildCost(hull_type, displacement, power) #Determine the cost to build and if this vessel's power plant and equipment are too heavy to be possible
+    if(not possible):
+        return 0.0, designspeed, 0.0, possible
+    
+    amortization = buildcost * n / designlife #Amortize the build cost of the fleet over their life
+    
+    station_keeping_cost = 0.0 #Estimate the costs used for standby ship station keeping
+    
     cost = fuel_annual_cost + crew_cost + amortization + station_keeping_cost
+    
     return cost, designspeed, power, possible
 
 def CalculateCrewCost(length, beam, draft): #Function To Find the Crewing Cost of each vessel
     pass
 
-def CalculateBuildCost(hull_type, length, beam, draft): #function to find the build cost of each vessel
+def CalculateBuildCost(hull_type, displacement, power): #function to find the build cost of each vessel
     if (hull_type == "Axe"):
-        pass
+         lightship = 0.529 * displacement
+         equip_weight = lightship * 0.128
+         plant_weight = 0.0376 * power -24.491
+         hull_weight = lightship - equip_weight - plant_weight
+         if hull_weight <= 0: #If our other weights are too high then we should reject this vessel
+             possible = False
+             qs = 1994.663
+             hull_weight = 0
+         else:
+             qs = 1994.663 + 0.015549 * hull_weight - 154.0222 * (hull_weight ** 0.2471932)
+             possible = True
+         qe = 9749.0427 + 14.66748 * equip_weight - 16.71265 * equip_weight ** 0.9963722
+         qp = 16720.374 + 0.7839685 * plant_weight - 221.3641 * plant_weight ** 0.510682
+         cost = qe * equip_weight + qp * plant_weight + qs * hull_weight
+         return cost, possible
 
     elif (hull_type == "X"):
-        pass
+         lightship = 0.529 * displacement
+         equip_weight = lightship * 0.128
+         plant_weight = 0.0376 * power -24.491
+         hull_weight = lightship - equip_weight - plant_weight
+         if hull_weight <= 0: #If our other weights are too high then we should reject this vessel
+             possible = False
+             qs = 1994.663
+             hull_weight = 0
+         else:
+             qs = 1994.663 + 0.015549 * hull_weight - 154.0222 * (hull_weight ** 0.2471932)
+             possible = True
+         qe = 9749.0427 + 14.66748 * equip_weight - 16.71265 * equip_weight ** 0.9963722
+         qp = 16720.374 + 0.7839685 * plant_weight - 221.3641 * plant_weight ** 0.510682
+         labour_cost_per_ton = qs - 500 #subtract the steel cost from the hull cost
+         labour_costs = labour_cost_per_ton * hull_weight
+         labour_costs *= 0.85
+         cost = qe * equip_weight + qp * plant_weight + 500 * hull_weight + labour_costs
+         return cost, possible
 
     elif (hull_type == "Vertical"):
-        pass
+         lightship = 0.529 * displacement
+         equip_weight = lightship * 0.128
+         plant_weight = 0.0376 * power -24.491
+         hull_weight = lightship - equip_weight - plant_weight
+         if hull_weight <= 0: #If our other weights are too high then we should reject this vessel
+             possible = False
+             qs = 1994.663
+             hull_weight = 0
+         else:
+             qs = 1994.663 + 0.015549 * hull_weight - 154.0222 * (hull_weight ** 0.2471932)
+             possible = True
+         qe = 9749.0427 + 14.66748 * equip_weight - 16.71265 * equip_weight ** 0.9963722
+         qp = 16720.374 + 0.7839685 * plant_weight - 221.3641 * plant_weight ** 0.510682
+         cost = qe * equip_weight + qp * plant_weight + qs * hull_weight
+         return cost, possible
 
     elif (hull_type == "Bulbous"):
-        pass
+         lightship = 0.529 * displacement
+         equip_weight = lightship * 0.128
+         plant_weight = 0.0376 * power -24.491
+         hull_weight = lightship - equip_weight - plant_weight
+         if hull_weight <= 0: #If our other weights are too high then we should reject this vessel
+             possible = False
+             qs = 1994.663
+             hull_weight = 0
+         else:
+             qs = 1994.663 + 0.015549 * hull_weight - 154.0222 * (hull_weight ** 0.2471932)
+             possible = True
+         qe = 9749.0427 + 14.66748 * equip_weight - 16.71265 * equip_weight ** 0.9963722
+         qp = 16720.374 + 0.7839685 * plant_weight - 221.3641 * plant_weight ** 0.510682
+         cost = qe * equip_weight + qp * plant_weight + qs * hull_weight
+         bulb_weight = displacement * 0.0138
+         bulb_cost = (0.03395 * 0.55 * 2.292 * bulb_weight ** 0.772) * 1000000
+         cost += bulb_cost
+         return cost, possible
 
     else:
         pass
