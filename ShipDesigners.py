@@ -46,8 +46,8 @@ deadweight_cargo = 16000.0 #Total weight of cargo per cycle tonnes
 max_vert_velocity = 0.4 #Maximum tolerable vertical velocity for which the cargo operations can occur m/s
 cycle_length = 72 #Length of a cargo cycle in hours
 StandbyShipRequired = True #Is a ship required for standby
-fuel_cost = 289.0 #Fuel cost is dollars/mt
-engine_efficiency = 151.0 #Engine fuel efficiency in g/kwh
+fuel_cost = 423 #Fuel cost is dollars/mt
+engine_efficiency = 188.7 #Engine fuel efficiency in g/kwh
 
 #Enter Design Limits
 l_min = 60 #minimum length considered in m
