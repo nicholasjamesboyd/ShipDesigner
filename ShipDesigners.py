@@ -93,7 +93,7 @@ for hulltype in hull_types: #Check Every Type of Hull
                 
                 for n in range(n_min,n_max+1,1): #for all possible fleet sizes
                     #Find the cost, average speed, and installed power required for this vessel arrangement
-                    cost, designspeed, power, possible = CC.CalculateCost(hulltype,length,beam,draft,displacement,n,Downtime,SailingConditions,StandbyShipRequired,field_distance,area_cargo,volume_cargo,deadweight_cargo,cycle_length,fuel_cost,engine_efficiency,designlife)
+                    cost, designspeed, power, possible = CC.CalculateCost(hulltype,length,beam,draft,displacement,n,Downtime,SailingConditions,StandbyShipRequired,field_distance,area_cargo,volume_cargo,deadweight_cargo,cycle_length,fuel_cost,engine_efficiency,designlife, Waves)
                     if (not possible): #If this is an impossible design, break the current iteration
                         continue
                     print(cycle) #Feedback on result progress

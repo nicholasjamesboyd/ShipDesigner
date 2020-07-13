@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-def CalculateCost(hull_type, length, beam, draft, displacement, n, downtime, sailingconditions, standby, distance, area, volume, deadweight, cycle_length, fuel_cost,efficiency,designlife):
+def CalculateCost(hull_type, length, beam, draft, displacement, n, downtime, sailingconditions, standby, distance, area, volume, deadweight, cycle_length, fuel_cost,efficiency,designlife,seastates):
     runs = CalculateNumberDeliveries(length,beam,displacement,area,volume,deadweight) #Find the number of required delivery runs
 
     designspeed, possible = CalculateRequiredSpeed(cycle_length,runs,downtime,distance,n,standby) #Determine the speed and if this vessel isn't impossibly fast
@@ -18,7 +18,7 @@ def CalculateCost(hull_type, length, beam, draft, displacement, n, downtime, sai
     
     amortization = buildcost * n / designlife #Amortize the build cost of the fleet over their life
     
-    station_keeping_cost = 0.0 #Estimate the costs used for standby ship station keeping
+    station_keeping_cost = CalculateRequiredPositionKeeping(seastates,sailingconditions,beam,draft,standby,n,runs,cycle_length,fuel_cost,efficiency)
     
     cost = fuel_annual_cost + Operating_Cost + amortization + station_keeping_cost
     
@@ -135,8 +135,56 @@ def CalculateNumberDeliveries(length, beam, displacement, area, volume, deadweig
     runs = math.ceil(runs)
     return runs
 
-def CalculateRequiredPositionKeeping(length, beam, draft, displacement, number_deliveries, standby, cycle_length): #calculate the total fuel consumption holding position
-    pass
+def CalculateRequiredPositionKeeping(seastates, sailingconditions, beam, draft, standby, n, runs, cycle_length, fuel_cost, efficiency): #calculate the total fuel consumption holding position
+    
+    StandbyWind = 6.5327*seastates[:,0]**0.6549 #Finds wind speeds corresponding to sea states
+   
+    UnloadWind = 6.5327*sailingconditions[:,0]**0.6549 #Finds wind speeds corresponding to seas during unloading
+    
+    #Assign Currents based on waves
+    StandbyCurrent = seastates[:,0]
+    StandbyCurrent = np.where(StandbyCurrent<0.4,0.25,StandbyCurrent)
+    StandbyCurrent = np.where((StandbyCurrent>=0.4) & (StandbyCurrent<0.8),0.5,StandbyCurrent)
+    StandbyCurrent = np.where(StandbyCurrent>=0.8,0.75,StandbyCurrent)
+
+    UnloadCurrent = sailingconditions[:,0]
+    UnloadCurrent = np.where(UnloadCurrent<0.4,0.25,UnloadCurrent)
+    UnloadCurrent = np.where((UnloadCurrent>=0.4) & (UnloadCurrent<0.8),0.5,UnloadCurrent)
+    UnloadCurrent = np.where(UnloadCurrent>=0.8,0.75,UnloadCurrent)
+
+    #Wind assumed to be bow on
+    WindCoefficient = 0.423
+
+    Depth = 1.333*draft + 3 #Hull depth at the bow, to account for a forecastle structure
+    HullArea = (Depth-draft) * beam
+
+    StandbyWindLoads = 0.5 * 1 * StandbyWind **2 * WindCoefficient * HullArea
+
+    UnloadWindLoads = 0.5 * 1 * UnloadWind **2 * WindCoefficient * HullArea
+
+    #TODO Estimate Superstructure area and Wind Loads
+
+    #TODO Define the Current and Wave Loads
+
+    StandbyTotalLoads = StandbyWindLoads
+    UnloadTotalLoads = UnloadWindLoads
+
+    StandbyAverageLoad = np.mean(StandbyTotalLoads)
+    UnloadAverageLoad = np.mean(UnloadTotalLoads)
+
+    StandbyPower = 0 #TODO Convert Loads to Powers
+    UnloadPower = 0
+
+    StandbyFuel = StandbyPower * cycle_length * efficiency / 1000000
+    UnloadFuel = UnloadPower * runs * 8 * efficiency/ 1000000
+
+    StandbyCost = StandbyFuel * fuel_cost
+    UnloadCost = UnloadFuel * fuel_cost
+
+    if (standby):
+        return round((StandbyCost + UnloadCost) * 8760 / cycle_length,0)
+    else:
+        return round(UnloadCost * 8760 / cycle_length,0)
 
 def CalculateRequiredSpeed(cycle_length,number_deliveries,downtime,distance,n,standby): #calculate the required speed for delivery
     time_to_load = 8 #time required to load up the vessel in hours
