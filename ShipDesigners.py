@@ -22,17 +22,13 @@ tdeviation = 2.008 #wave period standard deviation
 
 h = np.random.gumbel(mu, beta, 73000) #Generates a random significant wave height for 25 years of 3 hour seas
 
-for i in range(len(h)): #Removes any negative wave heights generated
-    if h[i] < 0:
-        h[i] = 0
+h = np.where(h < 0, 0, h)
 
 h = np.reshape(h,(-1,1))#organizes wave heights
 
 t = np.random.normal(tmean,tdeviation,73000)
 
-for i in range(len(t)):
-    if t[i] < 0:
-        t[i] = 0
+t = np.where(t<0,0,t)
 
 t = np.reshape(t,(-1,1)) #Generates random period for 25 years of 3 hour seas
 
@@ -52,16 +48,16 @@ engine_efficiency = 188.7 #Engine fuel efficiency in g/kwh
 #Enter Design Limits
 l_min = 60 #minimum length considered in m
 l_max = 120 #maximum length considered in m
-l_step = 1 #length stepping for design cases in m
+l_step = 5 #length stepping for design cases in m
 b_min = 20 #minimum beam considered in m
-b_max = 30 #maximum beam considered in m
-b_step = 1 #beam stepping for design cases in m
+b_max = 34 #maximum beam considered in m
+b_step = 2 #beam stepping for design cases in m
 t_min = 4 #minimum draft considered in m
 t_max = 8 #maximum draft considered in m
 t_step = 1 #draft stepping for design cases in m
 n_max = 6 #Maximum fleet size considered
 stabcriteria = 1.0 #Minimum GM value to be considered stable
-designlife = 20 #Design Lift of Ship in Years
+designlife = 25 #Design Life of Ship in Years
 
 if (StandbyShipRequired): #If a ship is required to be on standby we cannot have less than 2 ships
     n_min = 2

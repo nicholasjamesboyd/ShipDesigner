@@ -18,7 +18,7 @@ def CalculateCost(hull_type, length, beam, draft, displacement, n, downtime, sai
     
     amortization = buildcost * n / designlife #Amortize the build cost of the fleet over their life
     
-    station_keeping_cost = CalculateRequiredPositionKeeping(seastates,sailingconditions,beam,draft,standby,n,runs,cycle_length,fuel_cost,efficiency)
+    station_keeping_cost = CalculateRequiredPositionKeeping(seastates,sailingconditions,beam,draft,standby,n,runs,cycle_length,fuel_cost,efficiency, displacement, length)
     
     cost = fuel_annual_cost + Operating_Cost + amortization + station_keeping_cost
     
@@ -44,7 +44,7 @@ def CalculateOperatingCost(displacement, n): #Function To Find the Crewing Cost 
 
     operating_cost = crew_cost + insurance_costs + repair_costs + victuals_cost
     
-    return operating_cost
+    return round(operating_cost,0)
 
 def CalculateBuildCost(hull_type, displacement, power): #function to find the build cost of each vessel
     if (hull_type == "Axe"):
@@ -61,7 +61,7 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
              possible = True
          qe = 9749.0427 + 14.66748 * equip_weight - 16.71265 * equip_weight ** 0.9963722
          qp = 16720.374 + 0.7839685 * plant_weight - 221.3641 * plant_weight ** 0.510682
-         cost = qe * equip_weight + qp * plant_weight + qs * hull_weight
+         cost = round(qe * equip_weight + qp * plant_weight + qs * hull_weight,0)
          return cost, possible
 
     elif (hull_type == "X"):
@@ -81,7 +81,7 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
          labour_cost_per_ton = qs - 500 #subtract the steel cost from the hull cost
          labour_costs = labour_cost_per_ton * hull_weight
          labour_costs *= 0.85
-         cost = qe * equip_weight + qp * plant_weight + 500 * hull_weight + labour_costs
+         cost = round(qe * equip_weight + qp * plant_weight + 500 * hull_weight + labour_costs,0)
          return cost, possible
 
     elif (hull_type == "Vertical"):
@@ -98,7 +98,7 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
              possible = True
          qe = 9749.0427 + 14.66748 * equip_weight - 16.71265 * equip_weight ** 0.9963722
          qp = 16720.374 + 0.7839685 * plant_weight - 221.3641 * plant_weight ** 0.510682
-         cost = qe * equip_weight + qp * plant_weight + qs * hull_weight
+         cost = round(qe * equip_weight + qp * plant_weight + qs * hull_weight,0)
          return cost, possible
 
     elif (hull_type == "Bulbous"):
@@ -119,10 +119,11 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
          bulb_weight = displacement * 0.0138
          bulb_cost = (0.03395 * 0.55 * 2.292 * bulb_weight ** 0.772) * 1000000
          cost += bulb_cost
+         cost = round(cost,0)
          return cost, possible
 
     else:
-        pass
+        return 0,False
 
 def CalculateNumberDeliveries(length, beam, displacement, area, volume, deadweight): #function to find the number of deliveries that need to be completed in a given cycle
     Area_Ratio = 0.41 #Ratio between vessel block area and usable cargo area
@@ -135,7 +136,7 @@ def CalculateNumberDeliveries(length, beam, displacement, area, volume, deadweig
     runs = math.ceil(runs)
     return runs
 
-def CalculateRequiredPositionKeeping(seastates, sailingconditions, beam, draft, standby, n, runs, cycle_length, fuel_cost, efficiency): #calculate the total fuel consumption holding position
+def CalculateRequiredPositionKeeping(seastates, sailingconditions, beam, draft, standby, n, runs, cycle_length, fuel_cost, efficiency, displacement, length): #calculate the total fuel consumption holding position
     
     StandbyWind = 6.5327*seastates[:,0]**0.6549 #Finds wind speeds corresponding to sea states
    
@@ -155,25 +156,44 @@ def CalculateRequiredPositionKeeping(seastates, sailingconditions, beam, draft, 
     #Wind assumed to be bow on
     WindCoefficient = 0.423
 
-    Depth = 1.333*draft + 3 #Hull depth at the bow, to account for a forecastle structure
+    Depth = 1.333*draft + 9 #Hull depth at the bow, to account for a 2 deck forecastle structure and breakwater
     HullArea = (Depth-draft) * beam
 
-    StandbyWindLoads = 0.5 * 1 * StandbyWind **2 * WindCoefficient * HullArea
+    DeckhouseBeam = beam
+    DeckhouseHeight = 9 #Accounts for normal of 3 decks above the top of focsle
 
-    UnloadWindLoads = 0.5 * 1 * UnloadWind **2 * WindCoefficient * HullArea
+    DeckhouseArea = DeckhouseBeam * DeckhouseHeight
 
-    #TODO Estimate Superstructure area and Wind Loads
+    StandbyWindLoads = 0.5 * 0.001225 * StandbyWind **2 * WindCoefficient * HullArea #IMCA Hull Wind
+    StandbyWindLoads += 0.000615 * 1 * 1.18 * DeckhouseArea * StandbyWind **2 #IMCA Deckhouse Wind
 
-    #TODO Define the Current and Wave Loads
+    UnloadWindLoads = 0.5 * 0.001225 * UnloadWind **2 * WindCoefficient * HullArea
+    UnloadWindLoads += 0.000615 * 1 * 1.18 * DeckhouseArea * UnloadWind **2
 
-    StandbyTotalLoads = StandbyWindLoads
-    UnloadTotalLoads = UnloadWindLoads
+    CurrentFactor = 0.07 #Current coefficient for supply ships at 0 deg incidence current
 
-    StandbyAverageLoad = np.mean(StandbyTotalLoads)
+    StandbyCurrentLoads = 0.5 * 1.025 * StandbyCurrent ** 2 * beam * draft * CurrentFactor #Formula to derive the loading acting due to current in all cases
+    UnloadCurrentLoads = 0.5 * 1.025 * UnloadCurrent ** 2 * beam * draft * CurrentFactor
+   
+    StandbyTsurge = seastates[:,1] / (0.9 * length ** (1/3)) #From DNV calculation for dynamic positioning loads
+    UnloadTSurge = sailingconditions[:,1] / (0.9 * length ** (1/3))
+
+    FStandbyTSurge = np.where(StandbyTsurge < 1, 1, StandbyTsurge ** (-3) * np.exp(1 - StandbyTsurge ** (-3))) #From DNV Calculation
+    FUnloadTSurge = np.where(UnloadTSurge < 1, 1, UnloadTSurge ** (-3) * np.exp(1 - UnloadTSurge ** (-3)))
+
+    StandbyWaveLoads = 0.5 * 1.025 * 9.81 * seastates[:,0] ** 2 * beam * 0.0628 * FStandbyTSurge #From DNV Calculation
+    UnloadWaveLoads = 0.5 * 1.025 * 9.81 * sailingconditions[:,0] ** 2 * beam * 0.0628 * FUnloadTSurge
+
+    StandbyTotalLoads = StandbyWindLoads + StandbyCurrentLoads +  StandbyWaveLoads #Combine all station keepign loads
+    UnloadTotalLoads = UnloadWindLoads + UnloadCurrentLoads + UnloadWaveLoads
+
+    StandbyAverageLoad = np.mean(StandbyTotalLoads) #Find the average requirement across all sea states
     UnloadAverageLoad = np.mean(UnloadTotalLoads)
 
-    StandbyPower = 0 #TODO Convert Loads to Powers
-    UnloadPower = 0
+    ThrusterEfficiency = 0.10 #Efficiency of propellor to thrust in kN/kw power including mechanical losses and flow losses
+
+    StandbyPower = StandbyAverageLoad / ThrusterEfficiency #Get the power requirements to maintain this position
+    UnloadPower = UnloadAverageLoad / ThrusterEfficiency
 
     StandbyFuel = StandbyPower * cycle_length * efficiency / 1000000
     UnloadFuel = UnloadPower * runs * 8 * efficiency/ 1000000
