@@ -36,9 +36,8 @@ Waves = np.hstack((h,t)) #Builds an array for each sea, each row is a significan
 
 #Enter Operational Parameters
 field_distance = 250.0 #Distance in nautical miles
-area_cargo = 1500.0 #Total deck area of cargo delivered per cycle m^2
-volume_cargo = 8000.0 #Total bulk volument of cargo per cycle m^3
-deadweight_cargo = 16000.0 #Total weight of cargo per cycle tonnes
+area_cargo = 1006.0 #Total deck area of cargo delivered per cycle m^2
+volume_cargo = 2071.0 #Total bulk volument of cargo per cycle m^3
 max_vert_velocity = 0.6 #Maximum tolerable vertical velocity for which the cargo operations can occur m/s
 cycle_length = 72 #Length of a cargo cycle in hours
 StandbyShipRequired = True #Is a ship required for standby
@@ -89,7 +88,7 @@ for hulltype in hull_types: #Check Every Type of Hull
                 
                 for n in range(n_min,n_max+1,1): #for all possible fleet sizes
                     #Find the cost, average speed, and installed power required for this vessel arrangement
-                    cost, designspeed, power, possible = CC.CalculateCost(hulltype,length,beam,draft,displacement,n,Downtime,SailingConditions,StandbyShipRequired,field_distance,area_cargo,volume_cargo,deadweight_cargo,cycle_length,fuel_cost,engine_efficiency,designlife, Waves)
+                    cost, designspeed, power, possible = CC.CalculateCost(hulltype,length,beam,draft,displacement,n,Downtime,SailingConditions,StandbyShipRequired,field_distance,area_cargo,volume_cargo,cycle_length,fuel_cost,engine_efficiency,designlife, Waves)
                     if (not possible): #If this is an impossible design, break the current iteration
                         continue
                     print(cycle) #Feedback on result progress

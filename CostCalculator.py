@@ -1,8 +1,8 @@
 import math
 import numpy as np
 
-def CalculateCost(hull_type, length, beam, draft, displacement, n, downtime, sailingconditions, standby, distance, area, volume, deadweight, cycle_length, fuel_cost,efficiency,designlife,seastates):
-    runs = CalculateNumberDeliveries(length,beam,displacement,area,volume,deadweight) #Find the number of required delivery runs
+def CalculateCost(hull_type, length, beam, draft, displacement, n, downtime, sailingconditions, standby, distance, area, volume, cycle_length, fuel_cost,efficiency,designlife,seastates):
+    runs = CalculateNumberDeliveries(length,beam,displacement,area,volume) #Find the number of required delivery runs
 
     designspeed, possible = CalculateRequiredSpeed(cycle_length,runs,downtime,distance,n,standby) #Determine the speed and if this vessel isn't impossibly fast
     if(not possible):
@@ -50,7 +50,9 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
     if (hull_type == "Axe"):
          lightship = 0.529 * displacement
          equip_weight = lightship * 0.128
-         plant_weight = 0.0376 * power -24.491
+         plant_weight = 0.0376 * power - 24.491
+         if (plant_weight < 7.2):
+             plant_weight = 7.2
          hull_weight = lightship - equip_weight - plant_weight
          if hull_weight <= 0: #If our other weights are too high then we should reject this vessel
              possible = False
@@ -68,6 +70,8 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
          lightship = 0.529 * displacement
          equip_weight = lightship * 0.128
          plant_weight = 0.0376 * power -24.491
+         if (plant_weight < 7.2):
+             plant_weight = 7.2
          hull_weight = lightship - equip_weight - plant_weight
          if hull_weight <= 0: #If our other weights are too high then we should reject this vessel
              possible = False
@@ -88,6 +92,8 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
          lightship = 0.529 * displacement
          equip_weight = lightship * 0.128
          plant_weight = 0.0376 * power -24.491
+         if (plant_weight < 7.2):
+             plant_weight = 7.2
          hull_weight = lightship - equip_weight - plant_weight
          if hull_weight <= 0: #If our other weights are too high then we should reject this vessel
              possible = False
@@ -105,6 +111,8 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
          lightship = 0.529 * displacement
          equip_weight = lightship * 0.128
          plant_weight = 0.0376 * power -24.491
+         if (plant_weight < 7.2):
+             plant_weight = 7.2
          hull_weight = lightship - equip_weight - plant_weight
          if hull_weight <= 0: #If our other weights are too high then we should reject this vessel
              possible = False
@@ -125,14 +133,12 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
     else:
         return 0,False
 
-def CalculateNumberDeliveries(length, beam, displacement, area, volume, deadweight): #function to find the number of deliveries that need to be completed in a given cycle
+def CalculateNumberDeliveries(length, beam, displacement, area, volume): #function to find the number of deliveries that need to be completed in a given cycle
     Area_Ratio = 0.41 #Ratio between vessel block area and usable cargo area
     Volume_Ratio = 0.376 #Ratio between the displacement and the bulk volume capacity
-    Weight_Ratio = 0.471 #Ratio between the deadweight capacity and total displacement
     Area_Capacity = length * beam * Area_Ratio
     Volume_Capacity = displacement * Volume_Ratio
-    Weight_Capacity = displacement * Weight_Ratio
-    runs = max(area/Area_Capacity,volume/Volume_Capacity,deadweight/Weight_Capacity)
+    runs = max(area/Area_Capacity,volume/Volume_Capacity)
     runs = math.ceil(runs)
     return runs
 
