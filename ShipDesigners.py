@@ -4,7 +4,6 @@ import math
 import MotionFunctions as MF
 import CostCalculator as CC
 import StabilityCheck as STB
-import matplotlib.pyplot as MPL #Kept for now for debugging to remove in release
 
 def CalculateRuns(hulltypes,lmin,lmax,lstep,bmin,bmax,bstep,tmin,tmax,tstep,nmin,nmax): #calculate all the runs we need so we can initialize an appropriate numpy array, add 1 to account for the first value
     lruns = math.floor((lmax-lmin)/lstep)+1
@@ -48,8 +47,8 @@ engine_efficiency = 188.7 #Engine fuel efficiency in g/kwh
 l_min = 60 #minimum length considered in m
 l_max = 120 #maximum length considered in m
 l_step = 5 #length stepping for design cases in m
-b_min = 20 #minimum beam considered in m
-b_max = 34 #maximum beam considered in m
+b_min = 15 #minimum beam considered in m
+b_max = 25 #maximum beam considered in m
 b_step = 2 #beam stepping for design cases in m
 t_min = 4 #minimum draft considered in m
 t_max = 8 #maximum draft considered in m

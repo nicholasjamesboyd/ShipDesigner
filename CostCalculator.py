@@ -16,7 +16,8 @@ def CalculateCost(hull_type, length, beam, draft, displacement, n, downtime, sai
     if(not possible):
         return 0.0, designspeed, 0.0, possible
     
-    amortization = buildcost * n / designlife #Amortize the build cost of the fleet over their life
+    apr = 0.05 #Annual mortgage rate APR
+    amortization = 12 * buildcost * n * (apr/12*(1+apr/12)**(designlife*12))/((1+apr/12)**(designlife*12)-1) #Amortize the build cost of the fleet over their life based on the interest rate
     
     station_keeping_cost = CalculateRequiredPositionKeeping(seastates,sailingconditions,beam,draft,standby,n,runs,cycle_length,fuel_cost,efficiency, displacement, length)
     
@@ -247,7 +248,18 @@ def CalculateFuelCost(hull_type,length,beam,draft,speed,sailing_conditions,runs,
     if (hull_type == "Axe"):
         all_resistance = 10 ** (-0.15 - 0.0077*length + 0.021*beam + 0.25*draft + 0.15 * sailing_conditions[:,0] + 0.095 * speed - 0.0018*length*draft + 0.000086 * length ** 2 - 0.019 * sailing_conditions[:,0] ** 2 - 0.00091 * speed ** 2)
         average_resistance = np.mean(all_resistance)
-        power = round(average_resistance * speed * 0.5144,0)
+        power = round(average_resistance * speed * 0.5144,0) #Effective Power
+
+        # Power Efficiency Losses
+        QPC = 0.55 #Quasi Propulsive Coefficient accounts for and propellor efficiency
+        Eta_g = 0.95 #Gearbox Losses 
+        Eta_s = 0.98 #Shaft Losses
+        Eta_sw = 0.998 #Switchboard Losses
+        Eta_fc = 0.985 #Frequency Convertor Losses
+        Eta_motor = 0.97 #Electric Motor Efficiency
+
+        power = power / (QPC * Eta_g * Eta_s * Eta_sw * Eta_fc * Eta_motor) #Required Generator Power
+
         fuel_cost_per_run = power * 2 * distance/speed * efficiency * fuel_cost / 1000000
         cost_per_cycle = runs * fuel_cost_per_run
         fuel_annual_cost = round(8760 / cycle_length * cost_per_cycle,0)
@@ -257,6 +269,17 @@ def CalculateFuelCost(hull_type,length,beam,draft,speed,sailing_conditions,runs,
         all_resistance = 10 ** (-2.68 - 0.0033*length + 0.025*beam + 0.71*draft + 0.034*sailing_conditions[:,0] + 0.68*sailing_conditions[:,1] + 0.067*speed - 0.00013 * length * speed - 0.11*draft*sailing_conditions[:,1] - 0.029 * sailing_conditions[:,1]**2 + 0.0047*draft*sailing_conditions[:,1]**2)
         average_resistance = np.mean(all_resistance)
         power = round(average_resistance * speed * 0.5144,0)
+
+        # Power Efficiency Losses
+        QPC = 0.55 #Quasi Propulsive Coefficient accounts for and propellor efficiency
+        Eta_g = 0.95 #Gearbox Losses 
+        Eta_s = 0.98 #Shaft Losses
+        Eta_sw = 0.998 #Switchboard Losses
+        Eta_fc = 0.985 #Frequency Convertor Losses
+        Eta_motor = 0.97 #Electric Motor Efficiency
+
+        power = power / (QPC * Eta_g * Eta_s * Eta_sw * Eta_fc * Eta_motor) #Required Generator Power
+
         fuel_cost_per_run = power * 2*distance/speed * efficiency * fuel_cost / 1000000
         cost_per_cycle = runs * fuel_cost_per_run
         fuel_annual_cost = round(8760 / cycle_length * cost_per_cycle,0)
@@ -266,6 +289,15 @@ def CalculateFuelCost(hull_type,length,beam,draft,speed,sailing_conditions,runs,
         all_resistance = 10 ** (-4.62 - 0.011*length - 0.056*beam + 1.22*draft + 0.10*sailing_conditions[:,0] + 1.22*sailing_conditions[:,1] + 0.054 * speed + 0.00022*length*beam - 0.20*draft*sailing_conditions[:,1] - 0.0049*sailing_conditions[:,0]*sailing_conditions[:,1] + 0.0015*beam**2 - 0.05*sailing_conditions[:,1]**2 + 0.0082*draft*sailing_conditions[:,1]**2)
         average_resistance = np.mean(all_resistance)
         power = round(average_resistance * speed * 0.5144,0)
+        
+        # Power Efficiency Losses
+        QPC = 0.55 #Quasi Propulsive Coefficient accounts for and propellor efficiency
+        Eta_g = 0.95 #Gearbox Losses 
+        Eta_s = 0.98 #Shaft Losses
+        Eta_sw = 0.998 #Switchboard Losses
+        Eta_fc = 0.985 #Frequency Convertor Losses
+        Eta_motor = 0.97 #Electric Motor Efficiency        
+
         fuel_cost_per_run = power * 2 * distance/speed * efficiency * fuel_cost / 1000000
         cost_per_cycle = runs * fuel_cost_per_run
         fuel_annual_cost = round(8760 / cycle_length * cost_per_cycle,0)
@@ -275,6 +307,15 @@ def CalculateFuelCost(hull_type,length,beam,draft,speed,sailing_conditions,runs,
         all_resistance = 10 ** (-0.91 + 0.01*length + 0.023*beam + 0.2*draft + 0.032*sailing_conditions[:,0] + 0.14*speed - 0.0013 * length * draft - 0.00034 * length * speed - 0.00063 * speed ** 2)
         average_resistance = np.mean(all_resistance)
         power = round(average_resistance * speed * 0.5144,0)
+        
+        # Power Efficiency Losses
+        QPC = 0.55 #Quasi Propulsive Coefficient accounts for and propellor efficiency
+        Eta_g = 0.95 #Gearbox Losses 
+        Eta_s = 0.98 #Shaft Losses
+        Eta_sw = 0.998 #Switchboard Losses
+        Eta_fc = 0.985 #Frequency Convertor Losses
+        Eta_motor = 0.97 #Electric Motor Efficiency        
+        
         fuel_cost_per_run = power * 2 * distance/speed * efficiency * fuel_cost / 1000000
         cost_per_cycle = runs * fuel_cost_per_run
         fuel_annual_cost = round(8760 / cycle_length * cost_per_cycle,0)
