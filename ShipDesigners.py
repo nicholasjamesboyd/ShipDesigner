@@ -19,17 +19,19 @@ beta = 1.101 #Gumbel Beta Parameter for Wave Height
 tmean = 10.05 #mean wave period
 tdeviation = 2.008 #wave period standard deviation
 
-h = np.random.gumbel(mu, beta, 73000) #Generates a random significant wave height for 25 years of 3 hour seas
+h = np.zeros([73000,1]) #Intialize a numpy array for wave heights
+t = np.zeros([73000,1]) #Initialize a numpy array for periods
+
+for i in range(73000): #Generates a random significant wave height for 25 years of 3 hour seas
+    h[i] = np.random.gumbel(mu, beta)
+    t[i] = np.random.normal(tmean,tdeviation)
+    while h[i] > t[i] - 2: #If We have an impossible sea state keep generating numbers till it works
+        h[i] = np.random.gumbel(mu, beta)
+        t[i] = np.random.normal(tmean,tdeviation)
 
 h = np.where(h < 0, 0, h)
 
-h = np.reshape(h,(-1,1))#organizes wave heights
-
-t = np.random.normal(tmean,tdeviation,73000)
-
 t = np.where(t<0,0,t)
-
-t = np.reshape(t,(-1,1)) #Generates random period for 25 years of 3 hour seas
 
 Waves = np.hstack((h,t)) #Builds an array for each sea, each row is a significant wave height and peak period
 
