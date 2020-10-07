@@ -55,7 +55,7 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
          if (plant_weight < 7.2):
              plant_weight = 7.2
          hull_weight = lightship - equip_weight - plant_weight
-         if hull_weight <= 0: #If our other weights are too high then we should reject this vessel
+         if hull_weight < 0.29 * displacement: #If our other weights are too high then we should reject this vessel
              possible = False
              qs = 1994.663
              hull_weight = 0
@@ -74,7 +74,7 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
          if (plant_weight < 7.2):
              plant_weight = 7.2
          hull_weight = lightship - equip_weight - plant_weight
-         if hull_weight <= 0: #If our other weights are too high then we should reject this vessel
+         if hull_weight < 0.29 * displacement: #If our other weights are too high then we should reject this vessel
              possible = False
              qs = 1994.663
              hull_weight = 0
@@ -96,7 +96,7 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
          if (plant_weight < 7.2):
              plant_weight = 7.2
          hull_weight = lightship - equip_weight - plant_weight
-         if hull_weight <= 0: #If our other weights are too high then we should reject this vessel
+         if hull_weight < 0.29 * displacement: #If our other weights are too high then we should reject this vessel
              possible = False
              qs = 1994.663
              hull_weight = 0
@@ -115,7 +115,7 @@ def CalculateBuildCost(hull_type, displacement, power): #function to find the bu
          if (plant_weight < 7.2):
              plant_weight = 7.2
          hull_weight = lightship - equip_weight - plant_weight
-         if hull_weight <= 0: #If our other weights are too high then we should reject this vessel
+         if hull_weight < 0.29 * displacement: #If our other weights are too high then we should reject this vessel
              possible = False
              qs = 1994.663
              hull_weight = 0
