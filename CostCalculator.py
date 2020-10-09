@@ -246,7 +246,7 @@ def CalculateRequiredSpeed(cycle_length,number_deliveries,downtime,distance,n,st
 
 def CalculateFuelCost(hull_type,length,beam,draft,speed,sailing_conditions,runs,distance,cycle_length,fuel_cost,efficiency): #Calculates the fuel cost for the vessel
     if (hull_type == "Axe"):
-        all_resistance = 10 ** (-0.15 - 0.0077*length + 0.021*beam + 0.25*draft + 0.15 * sailing_conditions[:,0] + 0.095 * speed - 0.0018*length*draft + 0.000086 * length ** 2 - 0.019 * sailing_conditions[:,0] ** 2 - 0.00091 * speed ** 2)
+        all_resistance = 10 ** (-0.085 - 0.0087*length + 0.021*beam + 0.25*draft + 0.14 * sailing_conditions[:,0] + 0.094 * speed - 0.0019*length*draft + 0.000096 * length ** 2 - 0.017 * sailing_conditions[:,0] ** 2 - 0.00091 * speed ** 2)
         average_resistance = np.mean(all_resistance)
         power = round(average_resistance * speed * 0.5144,0) #Effective Power
 
@@ -266,7 +266,7 @@ def CalculateFuelCost(hull_type,length,beam,draft,speed,sailing_conditions,runs,
         return power, fuel_annual_cost
 
     elif (hull_type == "X"):
-        all_resistance = 10 ** (-2.68 - 0.0033*length + 0.025*beam + 0.71*draft + 0.034*sailing_conditions[:,0] + 0.68*sailing_conditions[:,1] + 0.067*speed - 0.00013 * length * speed - 0.11*draft*sailing_conditions[:,1] - 0.029 * sailing_conditions[:,1]**2 + 0.0047*draft*sailing_conditions[:,1]**2)
+        all_resistance = 10 ** (-2.32 - 0.0029*length + 0.027*beam + 0.65*draft + 0.036*sailing_conditions[:,0] + 0.59*sailing_conditions[:,1] + 0.070*speed - 0.00015 * length * speed - 0.098*draft*sailing_conditions[:,1] - 0.025 * sailing_conditions[:,1]**2 + 0.0042*draft*sailing_conditions[:,1]**2)
         average_resistance = np.mean(all_resistance)
         power = round(average_resistance * speed * 0.5144,0)
 
@@ -286,7 +286,7 @@ def CalculateFuelCost(hull_type,length,beam,draft,speed,sailing_conditions,runs,
         return power, fuel_annual_cost
 
     elif (hull_type == "Vertical"):
-        all_resistance = 10 ** (-4.62 - 0.011*length - 0.056*beam + 1.22*draft + 0.10*sailing_conditions[:,0] + 1.22*sailing_conditions[:,1] + 0.054 * speed + 0.00022*length*beam - 0.20*draft*sailing_conditions[:,1] - 0.0049*sailing_conditions[:,0]*sailing_conditions[:,1] + 0.0015*beam**2 - 0.05*sailing_conditions[:,1]**2 + 0.0082*draft*sailing_conditions[:,1]**2)
+        all_resistance = 10 ** (-4.16 - 0.012*length - 0.087*beam + 1.19*draft + 0.10*sailing_conditions[:,0] + 1.19*sailing_conditions[:,1] + 0.054 * speed + 0.00024*length*beam - 0.19*draft*sailing_conditions[:,1] - 0.0049*sailing_conditions[:,0]*sailing_conditions[:,1] + 0.0023*beam**2 - 0.049*sailing_conditions[:,1]**2 + 0.0080*draft*sailing_conditions[:,1]**2)
         average_resistance = np.mean(all_resistance)
         power = round(average_resistance * speed * 0.5144,0)
         
@@ -304,7 +304,7 @@ def CalculateFuelCost(hull_type,length,beam,draft,speed,sailing_conditions,runs,
         return power, fuel_annual_cost
 
     elif (hull_type == "Bulbous"):
-        all_resistance = 10 ** (-0.91 + 0.01*length + 0.023*beam + 0.2*draft + 0.032*sailing_conditions[:,0] + 0.14*speed - 0.0013 * length * draft - 0.00034 * length * speed - 0.00063 * speed ** 2)
+        all_resistance = 10 ** (-0.94 + 0.01*length + 0.025*beam + 0.19*draft + 0.032*sailing_conditions[:,0] + 0.14*speed - 0.0013 * length * draft - 0.00035 * length * speed - 0.00069 * speed ** 2)
         average_resistance = np.mean(all_resistance)
         power = round(average_resistance * speed * 0.5144,0)
         
