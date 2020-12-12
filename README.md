@@ -5,5 +5,5 @@ Enter parameters at the top of the ShipDesigners.py and CostCalculator.py files 
 
 Run the code and download the corresponding csv file for a sorted table of the most efficient fleet design
 
-This code is the implementation of the algorithm and equations described in the Master's Thesis "Design Optimization of OSVs for Operation 
-on the Flemish Pass Basin" by Nicholas Boyd, copyright Memorial University of Newfoundland
+This code is the implementation of the algorithm and equations described in the Master's Thesis "Concept Design Optimization of OSVs for Operation 
+on the Flemish Pass Basin" by Nicholas Boyd
